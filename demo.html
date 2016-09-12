@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>javascript 源码测试</title>
+	<meta http-equiv="Content-Type" charset="utf-8">
+	<style type="text/css">
+		*{margin:0px; padding: 0px; border:none;}
+		body{height: 5000px;}
+		.slideNav{position: fixed; right: 100px; top: 100px; width: 100px; height: 120px;}
+		.navList span{float: left; width: 100px; height: 40px; line-height: 40px; text-align: center; font-size: 16px;}
+	</style>
+</head>
+<body>
+<div class="slideNav" id="slideNav">
+	<div class="navList">
+		<span>第一层</span>
+		<span>第二层</span>
+		<span>第三层</span>
+		<span>第四层</span>
+	</div>
+</div>
+<input type="button" name="button" value="click here">
+<script src="zepto.min.js"></script>
+<script>
+function press(){alert("press me")}
+document.getElementsByTagName('input')[0].onclick = press;
+
+
+// ;(function($){
+// 	console.log($.contains($('.slideNav')[0],$('.navList')[0]));
+// 	// var aa = $.contains(".slideNav","div");
+// 	// console.log(aa);
+// })(Zepto);
+// console.log(document.getElementById('slideNav').contains(document.getElementsByTagName('span')[0]));
+</script>
+<script type="text/javascript">
+	var foo = "bar";
+	var baz = {foo};
+	console.log(baz);
+</script>
+</body>
+</html>
