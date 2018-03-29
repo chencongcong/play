@@ -1,0 +1,287 @@
+@function pow($number, $exp) {
+  $value: 1;
+  @if $exp > 0 {
+    @for $i from 1 through $exp {
+      $value: $value * $number;
+    }
+  }
+  @else if $exp < 0 {
+    @for $i from 1 through -$exp {
+      $value: $value / $number;
+    }
+  }
+  @return $value;
+}
+@function fact($number) {
+  $value: 1;
+  @if $number > 0 {
+    @for $i from 1 through $number {
+      $value: $value * $i;
+    }
+  }
+  @return $value;
+}
+@function pi() {
+  @return 3.14159265359;
+}
+
+@function rad($angle) {
+  $unit: unit($angle);
+  $unitless: $angle / ($angle * 0 + 1);
+  // If the angle has 'deg' as unit, convert to radians.
+  @if $unit == deg {
+    $unitless: $unitless / 180 * pi();
+  }
+  @return $unitless;
+}
+
+@function sin($angle) {
+  $sin: 0;
+  $angle: rad($angle);
+  // Iterate a bunch of times.
+  @for $i from 0 through 10 {
+    $sin: $sin + pow(-1, $i) * pow($angle, (2 * $i + 1)) / fact(2 * $i + 1);
+  }
+  @return $sin;
+}
+
+@function cos($angle) {
+  $cos: 0;
+  $angle: rad($angle);
+  // Iterate a bunch of times.
+  @for $i from 0 through 10 {
+    $cos: $cos + pow(-1, $i) * pow($angle, 2 * $i) / fact(2 * $i);
+  }
+  @return $cos;
+}
+
+@function tan($angle) {
+  @return sin($angle) / cos($angle);
+}
+
+@for $i from 1 through 100{
+  $ramNum : random()*360deg;
+  @keyframes moveround#{$i}{
+    0%{
+      transform: translate(0,0);
+      opacity: 0
+    }
+    30%{
+      opacity: 1;
+    }
+    100%{
+      transform: translate(sin($ramNum)*10rem,cos($ramNum)*10rem);
+      opacity: 1;
+    }
+  }
+  .moveround#{$i}{
+    animation: moveround#{$i} 2s linear random()*10s infinite;
+  }
+  
+}
+.stars-box{
+  position: absolute;
+  width: 100%;
+  height: 6rem;
+  z-index: 555;
+  top: 5rem;
+  span{
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    left: 50%;
+    top: 50%;
+    background-color: red;
+    opacity: 0;
+  }
+}
+@-webkit-keyframes slowMove{
+  0%{
+  -webkit-transform: translate3d(0,0,0);  
+  transform: translate3d(0,0,0);  
+  }
+  100%{
+  -webkit-transform: translate3d(-523px,0,0);
+  transform: translate3d(-523,0,0);
+  }
+}
+@keyframes slowMove{
+    0%{
+      -webkit-transform: translate3d(0,0,0);  
+      transform: translate3d(0,0,0);  
+    }
+    100%{
+      -webkit-transform: translate3d(-523px,0,0);
+      transform: translate3d(-523px,0,0);
+    }
+}
+.slowMove{
+  -webkit-animation-name: slowMove;
+  animation-name: slowMove;
+
+  -webkit-animation-timing-function:linear;
+  animation-timing-function:linear;
+
+  -webkit-animation-iteration-count:infinite;
+  animation-iteration-count:infinite;
+
+  animation-duration: 5s;
+
+}
+
+.p2Btm{
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 50rem;
+  height: 8.3281rem;
+  z-index: 0;
+  transform: translate3d(0,0,0);
+  li{
+    float: left;
+    width: 23.6875rem;
+    height: 8.3281rem;
+  }
+}
+.swiper-slide{
+  // background-image: none !important;
+  background-color: transparent !important;
+}
+.hand-note{
+  position: absolute;
+  right: 1.5625rem;
+  top: 3.125rem;
+  width: 1.5625rem;
+  height: 1.25rem;
+  background: url(../images/zhi2.png) no-repeat;
+  background-size: 100% 100%;
+  opacity: 0;
+  animation: moveLeft 3s linear 0s infinite;
+  &:after{
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: -5px;
+    width: .4688rem;
+    height: .4688rem;
+    border-radius: 50%;
+    background-color: #fff;
+    opacity: 0;
+    animation: dotOut 3s ease-in-out 0s infinite;
+  }
+}
+@keyframes moveLeft{
+  0%{
+    transform: scale(1.5) translate(0,0);
+    opacity: 0;
+  }
+  5%{
+    transform: scale(1) translate(0,0);
+    opacity: 1;
+  }
+  70%{
+    transform: scale(1) translate(-150px,0);
+    opacity: 1;
+  }
+  80%{
+    transform: scale(1) translate(-150px,0);
+    opacity: 0;
+  }
+  100%{
+    transform: scale(1) translate(-150px,0);
+    opacity: 0;
+  }
+}
+@keyframes dotOut{
+  0%{
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  10%{
+    transform: scale(1.2);
+    opacity: 0.2;
+  }
+  11%{
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  100%{
+    transform: scale(1);
+    opacity: 0.5;
+  }
+}
+.trangle{
+  width: 0;
+  height: 0;
+  border-width: 1.5625rem;
+  border-color: transparent transparent green transparent;
+  border-style: solid;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,0);
+  animation: trangleDou 5s ease-in-out 0s infinite;
+}
+@keyframes trangleDou{
+  0%{
+    transform: translateY(0);
+  }
+  50%{
+    transform: translateY(-20px);
+  }
+  100%{
+    transform: translateY(0);
+  }
+}
+
+@mixin makedot($r,$color){
+  // $r:.4688rem;
+  // $color:#fff;
+  width: $r;
+  height: $r;
+  background-color: $color;
+  border-radius: 50%;
+}
+.click-dot{
+  @include makedot(.2688rem,#fff);
+  position: absolute;
+  right:2.3438rem;
+  top: 5.6875rem;
+  animation: cDot 3s linear 0s infinite;
+  &:after{
+    @include makedot(.2688rem,#fff);
+    content: "";
+    position: absolute;
+    right:0;
+    top: 0;
+    // animation: bDot 3s ease-in-out 0s infinite;
+  }
+}
+@keyframes cDot{
+  0%{
+    transform: scale(1);
+  }
+  10%{
+    transform: scale(1.2);
+  }
+  20%{
+    transform: scale(1);
+  }
+  100%{
+    transform: scale(1);
+  }
+}
+@keyframes bDot{
+  0%{
+    transform: scale(1);
+    opacity: 1;
+  }
+  10%{
+    opacity: 0.6;
+  }
+  100%{
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
