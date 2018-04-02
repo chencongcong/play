@@ -15,10 +15,28 @@
     <link rel="stylesheet" href="./css/swiper.min.css">
     <link rel="stylesheet" href="./css/app.css">
     <link rel="stylesheet" href="./css/index.css">
+    <style>
+      *{padding:0;margin:0}
+      ul{list-style: none}
+      html,body,.swiper-container{
+        width: 100%;
+        height: 100%;
+      }
+      .parallax-bg1{ position:absolute; width: 10000px; height: 100%; }
+      .parallax-bg1 li{
+        float: left;
+        width: 1920px; 
+        height: 100%;
+        background: url(./static/timg.jpeg) no-repeat;
+      }
+    </style>
 </head>
 <body class="mybody">
 <div id="myForm" class="my-form">
     <div class="swiper-container" id="swiper-container">
+        <ul class="parallax-bg1">
+                <li></li>
+            </ul>
         <div class="swiper-wrapper">
             <div class="swiper-slide slide1">
                 <div class="ani imgBx p2_03" swiper-animate-effect="fadeIn" swiper-animate-duration="1s" swiper-animate-delay="0s"><img src="./images/p2_03.png" alt=""></div>
