@@ -1,99 +1,114 @@
 $(function(){
-    const clientW = $(window).width();
-    const tWidth = $('#js-scrollLoop > li:first').width();
-    let animationFrame = null;
-    var bgLoop={
-        _sx:0,
-        _max:640,
-        _min:-tWidth,
-        _tWidth:tWidth,
-        _target:'#js-scrollLoop',
-        _firstChild:'#js-scrollLoop > li:first',
+    var cWidth = $(window).width(); //游览器宽度
+    var bgWidth = $('.parallax-bg1 li:first').width(); 
+    var diff = bgWidth - cWidth;//位移距离
+    let animationFrame = null;//记录动画
+    function BgLoop(time){
+        this._startx=0;
+        this._endx=-bgWidth;
+        this._target='.parallax-bg1';
+        this._speed= diff/time;
+        this._timer=time;
+        this._appendFlag=true; 
+    }
+
+    $.extend(BgLoop.prototype,{
         _append:function(){
-            $(this._target).append($(this._firstChild).clone())
+            let cloneLi = $(this._target).find('li:first').clone();
+            $(this._target).append(cloneLi);
+            this._appendFlag=false;
         },
         _prepend:function(){
             $(this._target).prepend($(this._firstChild).clone())
         },
         _remove:function(){
-            $(this._target).find('li:last').remove()
+            $(this._target).find('li:last').remove();
+            this._appendFlag=true;
         },
-        _removeB:function(){
-            $(this._target).find('li:first').remove()
-        },
-        swipeleft:function(time){
-            let timer = time||10000;
+        swipeleft:function(sx,ex,timer){
             let _this = this;
-            animationFrame
-            animationFrame=Math.animation(_this._sx,_this._min,function(value,isEnding){
-                if(Math.ceil(value)===Math.ceil(_this._min+clientW+1)){
-                    _this._append();
-                }
-                if(isEnding){
-                    _this._sx=0;
-                    _this.swipeleft(timer)
-                    setTimeout(function(){
-                        _this._remove()
-                    },10)
+            if(animationFrame) cancelAnimationFrame(animationFrame());
+            if(this._appendFlag)this._append();
+            animationFrame=Math.animation(sx,ex,function(value,isEnding){
+                //滑动效果结束，但是还没有滑到0位置
+                if(isEnding&&Math.abs(value)<Math.abs(_this._endx)){
+                    _this._startx = value;
+                    let t = Math.abs((_this._endx-value)/_this._speed);
+                    _this.swipeleft(_this._startx,_this._endx,t)
+                // 到0的位置
+                }else if(Math.ceil(value)===Math.ceil(_this._endx)){
+                    _this._startx = 0;
+                    _this.swipeleft(_this._startx,_this._endx,_this._timer)
                 }else{
-                    $(_this._target).css('transform','translateX(' + value + 'px)');
+                    // 记录位置
+                    _this._startx=value;   
                 }
+                // 给图像赋值
+                $(_this._target).css('transform',`translate3d(${_this._startx}px,0,0)`);
             },'Linear', timer)
         },
-        swiperight:function(time){
-            let timer = time||10000;
-            let _this = this;
-            animationFrame=Math.animation(_this._min,0,function(value,isEnding){
-                if(Math.ceil(value)===Math.ceil(_this._min)){
-                    _this._append();
-                }
-                if(isEnding){
-                    _this.swiperight(timer)
-                    setTimeout(function(){
-                        _this._remove()
-                    },10)
-                    
-                }else{
-                    $(_this._target).css('transform','translateX(' + value + 'px)');
-                }
-            },'Linear', timer)
+        swiperight:function(sx,ex,timer){
+            this.swipeleft(sx,ex,timer);
         },
         init:function(){
-            // swipeleft(100000)
-        //    this._append();
-        //    this._remove();
-            // this.swiperight(10000)
+            this.swipeleft(0,-diff,this._timer) 
         }
-    }
+    })
+    var bgLoop = new BgLoop(10000);
     bgLoop.init();
-    var mySwiper = new Swiper ('.swiper-container', {
-        direction : 'horizontal',
-        loop: true,
-        effect : 'slide',
-        on:{
-            init: function() {
-                swiperAnimateCache(this); //隐藏动画元素 
-                swiperAnimate(this); //初始化完成开始动画
-                // bgLoop.swipeleft(100000)
-            },
-            touchStart:function(event){
-            },
-            touchMove:function(event){
-                
-            },
-            setTransition:function(){
-
-            },
-            transitionStart:function(){
-                // bgLoop.swipeleft(10000)
-            },
-            transitionEnd: function(){ 
-                // bgLoop.swipeleft(100000)
-                swiperAnimate(this); //每个slide切换结束时也运行当前slide动画
-            } 
-        }
+    var swiper = new Swiper('.swiper-container', {
+    speed: 600,
+    parallax: false,
+    loop:true,
+    navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev',
+    },
+    on:{
+      touchStart:function(e){
         
-    });
+        
+      },
+      touchMove:function(){
+        console.log(this.touches)
+      },
+      touchEnd:function(e){
+        // bgLoop.swipeleft(bgLoop._startx,bgLoop._endx,10000)
+      }
+    }
+  });
+    
+    swiper.navigation.$nextEl.on('click',function(){
+      if(animationFrame) cancelAnimationFrame(animationFrame());
+        //获取改变后的位置
+        let nsx = bgLoop._startx-640;
+        if(nsx < bgLoop._endx-640){
+            bgLoop._startx=0
+            nsx=bgLoop._startx-640;
+            $(bgLoop._target).css('transform',`translate3d(${bgLoop._startx}px,0,0)`);
+        }
+        // let nsx = Math.abs(bgLoop._startx-640)>Math.abs(bgLoop._endx)?bgLoop._endx:bgLoop._startx-640;
+        
+        //获取位置改变后还有多少距离
+        // let ndis = Math.abs(bgLoop._endx-nsx);
+        //速度不变 得到完成所需时间
+        // let t = ndis/bgLoop._speed;
+        bgLoop.swipeleft(bgLoop._startx,nsx,600)
+    })
+    swiper.navigation.$prevEl.on('click',function(){
+      if(animationFrame) cancelAnimationFrame(animationFrame());
+      let nsx = bgLoop._startx+640;
+      if(nsx>0){
+        //当向右边到0时，将整个图瞬间拉到第一张图的最右边；
+        bgLoop._startx=bgLoop._endx+bgLoop._startx+640-cWidth;
+        // nsx=bgLoop._endx+bgLoop._startx+640+640;
+        nsx = bgLoop._startx+640
+        $(bgLoop._target).css('transform',`translate3d(${bgLoop._startx}px,0,0)`);
+      }
+      let ndis = Math.abs(nsx);
+    //   let t = ndis/bgLoop._speed;
+      bgLoop.swiperight(bgLoop._startx,nsx,600)
+    })
     mySwiper.slideTo(2, 1000, true);
     
     //生成100个星星
